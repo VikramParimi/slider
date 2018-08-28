@@ -8,9 +8,16 @@
 
 import UIKit
 
-@IBDesignable open class VerticalSlider: UIControl {
+private enum SliderImageType {
+    case thumb
+    case minimumTrack
+    case maximumTrack
+}
+
+@IBDesignable public class VerticalSlider: UIControl {
     
-    public let slider = Slider()
+    private let slider = Slider()
+    private let gradientView = GradientView()
 
     public required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
@@ -26,79 +33,104 @@ import UIKit
     }
 
     fileprivate func initialize() {
+        addSubview(gradientView)
         addSubview(slider)
     }
     
-    open override func layoutSubviews() {
+    public override func layoutSubviews() {
         super.layoutSubviews()
         
         //Transform the slider to vertical
         slider.transform = CGAffineTransform(rotationAngle: CGFloat.pi * -0.5)
         
         //Adjust slider frame
-        slider.bounds.size.width = bounds.height
+        slider.bounds.size.width = bounds.height - 10
         slider.center.x = bounds.midX
         slider.center.y = bounds.midY
         
-        updateSlider()
+        updateSliderApperance()
+        
+        //Adjust gradientView frame
+        gradientView.center.x = bounds.midX
+        gradientView.center.y = bounds.midY
+        
+        gradientView.bounds.size.width  = slider.trackRect(forBounds: slider.bounds).height
+        gradientView.bounds.size.height = slider.trackRect(forBounds: slider.bounds).width
+        
+        gradientView.layer.cornerRadius = 10
     }
     
-    func updateSlider() {
-//        let renderer = UIGraphicsImageRenderer(size: CGSize(width: 30, height: 30))
-//        
-//        let thumbImage = renderer.image { context in
-//            context.cgContext.setFillColor(UIColor.white.cgColor)
-//            context.cgContext.fillEllipse(in: CGRect(x: 0, y: 0, width: 30, height: 30))
-//            context.cgContext.drawPath(using: .fillStroke)
-//            context.cgContext.closePath()
-//        }
-//        
-//        slider.setThumbImage(thumbImage, for: .normal)
+    fileprivate func updateSliderApperance() {
+        
+        let thumbImage = getImagefor(SliderImageType.thumb,
+                                     ofSize: CGSize(width: 27.5, height: 27.5),
+                                     withColor: UIColor.white)
+        slider.setThumbImage(thumbImage, for: .normal)
+        
+        let minimumTrackImage = getImagefor(SliderImageType.minimumTrack,
+                                            ofSize: CGSize(width: 20, height: 20),
+                                            withColor: UIColor.clear)
+        slider.setMinimumTrackImage(minimumTrackImage, for: .normal)
+        
+        var maximumTrackImage = getImagefor(SliderImageType.maximumTrack,
+                                            ofSize: CGSize(width: 20, height: 20),
+                                            withColor: UIColor.lightGray)
+        maximumTrackImage = maximumTrackImage.resizableImage(withCapInsets: UIEdgeInsets(top: 8,
+                                                                                         left: 8,
+                                                                                         bottom: 8,
+                                                                                         right: 8),
+                                                             resizingMode: .stretch)
+        slider.setMaximumTrackImage(maximumTrackImage, for: .normal)
+        
+        slider.minimumValue = 0
+        slider.value = 4
+        slider.maximumValue = 10
     }
     
-    override open var intrinsicContentSize: CGSize {
-        get {
-            return CGSize(width: slider.intrinsicContentSize.height, height: slider.intrinsicContentSize.width)
-        }
-    }
-}
+    fileprivate func getImagefor(_ type: SliderImageType, ofSize: CGSize, withColor: UIColor) -> UIImage {
 
-public class Slider: UISlider {
-    override public func trackRect(forBounds bounds: CGRect) -> CGRect {
-        let customBounds = CGRect(x: bounds.origin.x, y: bounds.height/2 - 10, width: bounds.size.width, height: 20)
-        super.trackRect(forBounds: customBounds)
-        return customBounds
-    }
-    
-    public override func minimumTrackImage(for state: UIControl.State) -> UIImage? {
-        return getTrackImageWith(color: #colorLiteral(red: 0.3411764801, green: 0.6235294342, blue: 0.1686274558, alpha: 1))
-    }
-    
-    public override func maximumTrackImage(for state: UIControl.State) -> UIImage? {
-        return getTrackImageWith(color: #colorLiteral(red: 0.6666666865, green: 0.6666666865, blue: 0.6666666865, alpha: 1))
-    }
-    
-    public override func thumbImage(for state: UIControl.State) -> UIImage? {
-        let renderer = UIGraphicsImageRenderer(size: CGSize(width: 30, height: 30))
-
-        let thumbImage = renderer.image { context in
-            context.cgContext.setFillColor(UIColor.white.cgColor)
-            context.cgContext.fillEllipse(in: CGRect(x: 0, y: 0, width: 30, height: 30))
-            context.cgContext.drawPath(using: .fillStroke)
-            context.cgContext.closePath()
-        }
-        return thumbImage
-    }
-    
-    fileprivate func getTrackImageWith(color: UIColor) -> UIImage {
-        let renderer = UIGraphicsImageRenderer(size: CGSize(width: 20, height: 20))
+        let renderer = UIGraphicsImageRenderer(size: ofSize)
+        
         let image = renderer.image { context in
-            context.cgContext.setFillColor(color.cgColor)
-            let rect = CGRect(x: 0, y: 0, width: bounds.width, height: 20)
-            context.cgContext.fill(rect)
+            context.cgContext.setFillColor(withColor.cgColor)
+            context.cgContext.fillEllipse(in: CGRect(x: 0, y: 0, width: ofSize.width, height: ofSize.height))
+            
+            switch type {
+            case .thumb:
+                break
+            case .minimumTrack:
+                break
+            case .maximumTrack:
+                break
+            }
+            
             context.cgContext.drawPath(using: .fillStroke)
             context.cgContext.closePath()
         }
         return image
+    }
+}
+
+
+private class Slider: UISlider {
+    
+    override public func trackRect(forBounds bounds: CGRect) -> CGRect {
+        
+        let customBounds = CGRect(x: bounds.origin.x, y: bounds.height/2 - 10, width: bounds.size.width, height: 20)
+        super.trackRect(forBounds: customBounds)
+        return customBounds
+    }
+}
+
+private class GradientView: UIView {
+    
+    override func layoutSubviews() {
+        
+        let gradientlayer = CAGradientLayer()
+        gradientlayer.frame = bounds
+        gradientlayer.cornerRadius = 10
+        gradientlayer.colors = [#colorLiteral(red: 0.7764705882, green: 0.9725490196, blue: 0, alpha: 0.5).cgColor, #colorLiteral(red: 0.09019607843, green: 0.2823529412, blue: 0.7098039216, alpha: 1).cgColor]
+        gradientlayer.locations = [0.0, 1.0]
+        layer.addSublayer(gradientlayer)
     }
 }

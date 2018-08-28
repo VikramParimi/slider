@@ -18,16 +18,16 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="SCe-C4-ERH" customClass="VerticalSlider" customModule="VerticalGradientSlider" customModuleProvider="target">
-                                <rect key="frame" x="37.5" y="183.5" width="300" height="300"/>
-                                <color key="backgroundColor" cocoaTouchSystemColor="darkTextColor"/>
+                                <rect key="frame" x="0.0" y="183.5" width="375" height="300"/>
+                                <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <constraints>
-                                    <constraint firstAttribute="width" constant="300" id="jy1-7A-Oux"/>
                                     <constraint firstAttribute="height" constant="300" id="qEX-4X-i8C"/>
                                 </constraints>
                             </view>
                         </subviews>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
+                            <constraint firstItem="SCe-C4-ERH" firstAttribute="width" secondItem="8bC-Xf-vdC" secondAttribute="width" id="1dI-MF-vTe"/>
                             <constraint firstItem="SCe-C4-ERH" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="8Ir-YS-Hd5"/>
                             <constraint firstItem="SCe-C4-ERH" firstAttribute="centerY" secondItem="8bC-Xf-vdC" secondAttribute="centerY" id="OQA-RQ-NfQ"/>
                         </constraints>
