@@ -44,16 +44,16 @@ import UIKit
     }
     
     func updateSlider() {
-        let renderer = UIGraphicsImageRenderer(size: CGSize(width: 30, height: 30))
-        
-        let thumbImage = renderer.image { context in
-            context.cgContext.setFillColor(UIColor.white.cgColor)
-            context.cgContext.fillEllipse(in: CGRect(x: 0, y: 0, width: 30, height: 30))
-            context.cgContext.drawPath(using: .fillStroke)
-            context.cgContext.closePath()
-        }
-        
-        slider.setThumbImage(thumbImage, for: .normal)
+//        let renderer = UIGraphicsImageRenderer(size: CGSize(width: 30, height: 30))
+//        
+//        let thumbImage = renderer.image { context in
+//            context.cgContext.setFillColor(UIColor.white.cgColor)
+//            context.cgContext.fillEllipse(in: CGRect(x: 0, y: 0, width: 30, height: 30))
+//            context.cgContext.drawPath(using: .fillStroke)
+//            context.cgContext.closePath()
+//        }
+//        
+//        slider.setThumbImage(thumbImage, for: .normal)
     }
     
     override open var intrinsicContentSize: CGSize {
@@ -78,17 +78,17 @@ public class Slider: UISlider {
         return getTrackImageWith(color: #colorLiteral(red: 0.6666666865, green: 0.6666666865, blue: 0.6666666865, alpha: 1))
     }
     
-//    public override func thumbImage(for state: UIControl.State) -> UIImage? {
-//        let renderer = UIGraphicsImageRenderer(size: CGSize(width: 30, height: 30))
-//
-//        let thumbImage = renderer.image { context in
-//            context.cgContext.setFillColor(UIColor.white.cgColor)
-//            context.cgContext.fillEllipse(in: CGRect(x: 0, y: 0, width: 30, height: 30))
-//            context.cgContext.drawPath(using: .fillStroke)
-//            context.cgContext.closePath()
-//        }
-//        return thumbImage
-//    }
+    public override func thumbImage(for state: UIControl.State) -> UIImage? {
+        let renderer = UIGraphicsImageRenderer(size: CGSize(width: 30, height: 30))
+
+        let thumbImage = renderer.image { context in
+            context.cgContext.setFillColor(UIColor.white.cgColor)
+            context.cgContext.fillEllipse(in: CGRect(x: 0, y: 0, width: 30, height: 30))
+            context.cgContext.drawPath(using: .fillStroke)
+            context.cgContext.closePath()
+        }
+        return thumbImage
+    }
     
     fileprivate func getTrackImageWith(color: UIColor) -> UIImage {
         let renderer = UIGraphicsImageRenderer(size: CGSize(width: 20, height: 20))
