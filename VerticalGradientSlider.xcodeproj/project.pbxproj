@@ -14,6 +14,9 @@
 		FB9A694E2134176400C6F8C6 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FB9A694D2134176400C6F8C6 /* Assets.xcassets */; };
 		FB9A69512134176400C6F8C6 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = FB9A694F2134176400C6F8C6 /* LaunchScreen.storyboard */; };
 		FB9A695C2134176400C6F8C6 /* VerticalGradientSliderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB9A695B2134176400C6F8C6 /* VerticalGradientSliderTests.swift */; };
+		FBFA1A0A2136CD9A006D808B /* Slider.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBFA1A092136CD9A006D808B /* Slider.swift */; };
+		FBFA1A0C2136CDC6006D808B /* GradientView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBFA1A0B2136CDC6006D808B /* GradientView.swift */; };
+		FBFA1A0E2136CE4A006D808B /* SliderTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBFA1A0D2136CE4A006D808B /* SliderTextView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -38,6 +41,9 @@
 		FB9A69572134176400C6F8C6 /* VerticalGradientSliderTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = VerticalGradientSliderTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		FB9A695B2134176400C6F8C6 /* VerticalGradientSliderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VerticalGradientSliderTests.swift; sourceTree = "<group>"; };
 		FB9A695D2134176400C6F8C6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		FBFA1A092136CD9A006D808B /* Slider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Slider.swift; sourceTree = "<group>"; };
+		FBFA1A0B2136CDC6006D808B /* GradientView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GradientView.swift; sourceTree = "<group>"; };
+		FBFA1A0D2136CE4A006D808B /* SliderTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SliderTextView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -82,6 +88,9 @@
 				FB9A69462134176200C6F8C6 /* AppDelegate.swift */,
 				FB9A69482134176200C6F8C6 /* ViewController.swift */,
 				FB02FB20213544D600A58D95 /* VerticalSlider.swift */,
+				FBFA1A092136CD9A006D808B /* Slider.swift */,
+				FBFA1A0B2136CDC6006D808B /* GradientView.swift */,
+				FBFA1A0D2136CE4A006D808B /* SliderTextView.swift */,
 				FB9A694A2134176200C6F8C6 /* Main.storyboard */,
 				FB9A694D2134176400C6F8C6 /* Assets.xcassets */,
 				FB9A694F2134176400C6F8C6 /* LaunchScreen.storyboard */,
@@ -202,6 +211,9 @@
 			files = (
 				FB9A69492134176200C6F8C6 /* ViewController.swift in Sources */,
 				FB9A69472134176200C6F8C6 /* AppDelegate.swift in Sources */,
+				FBFA1A0E2136CE4A006D808B /* SliderTextView.swift in Sources */,
+				FBFA1A0C2136CDC6006D808B /* GradientView.swift in Sources */,
+				FBFA1A0A2136CD9A006D808B /* Slider.swift in Sources */,
 				FB02FB21213544D600A58D95 /* VerticalSlider.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

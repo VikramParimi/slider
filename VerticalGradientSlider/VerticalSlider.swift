@@ -18,6 +18,7 @@ private enum SliderImageType {
     
     private let slider = Slider()
     private let gradientView = GradientView()
+    private lazy var sliderTextLabel = UILabel()
 
     public required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
@@ -33,7 +34,10 @@ private enum SliderImageType {
     }
 
     fileprivate func initialize() {
+        
         addSubview(gradientView)
+        
+        slider.delegate = self
         addSubview(slider)
     }
     
@@ -48,6 +52,7 @@ private enum SliderImageType {
         slider.center.x = bounds.midX
         slider.center.y = bounds.midY
         
+        //Update slider appearance with gradientlayers and new thumb image
         updateSliderApperance()
         
         //Adjust gradientView frame
@@ -62,75 +67,104 @@ private enum SliderImageType {
     
     fileprivate func updateSliderApperance() {
         
+        //Set the custom thumb image
         let thumbImage = getImagefor(SliderImageType.thumb,
                                      ofSize: CGSize(width: 27.5, height: 27.5),
                                      withColor: UIColor.white)
-        slider.setThumbImage(thumbImage, for: .normal)
         
+        //Set an Empty Image
         let minimumTrackImage = getImagefor(SliderImageType.minimumTrack,
                                             ofSize: CGSize(width: 20, height: 20),
                                             withColor: UIColor.clear)
-        slider.setMinimumTrackImage(minimumTrackImage, for: .normal)
         
+        //Set the maximum track image with one single color and resize it along
         var maximumTrackImage = getImagefor(SliderImageType.maximumTrack,
                                             ofSize: CGSize(width: 20, height: 20),
-                                            withColor: UIColor.lightGray)
+                                            withColor: #colorLiteral(red: 0.8509803922, green: 0.8509803922, blue: 0.8509803922, alpha: 1))
         maximumTrackImage = maximumTrackImage.resizableImage(withCapInsets: UIEdgeInsets(top: 8,
                                                                                          left: 8,
                                                                                          bottom: 8,
                                                                                          right: 8),
                                                              resizingMode: .stretch)
+        
+        slider.setMinimumTrackImage(minimumTrackImage, for: .normal)
+        slider.setThumbImage(thumbImage, for: .normal)
         slider.setMaximumTrackImage(maximumTrackImage, for: .normal)
         
+        //Set the selector for tracking the value changes of the slider
+        slider.addTarget(slider, action: #selector(Slider.sliderValueChanged(slider:forEvent:)), for: .valueChanged)
+        
+        // FIXME: Removed hardcoded values, set through IB Inspectables
         slider.minimumValue = 0
-        slider.value = 4
-        slider.maximumValue = 10
+        slider.value = 10
+        slider.maximumValue = 100
     }
     
     fileprivate func getImagefor(_ type: SliderImageType, ofSize: CGSize, withColor: UIColor) -> UIImage {
 
         let renderer = UIGraphicsImageRenderer(size: ofSize)
-        
         let image = renderer.image { context in
             context.cgContext.setFillColor(withColor.cgColor)
-            context.cgContext.fillEllipse(in: CGRect(x: 0, y: 0, width: ofSize.width, height: ofSize.height))
+            
+            let rect  = CGRect(x: 0,
+                               y: 0,
+                               width: ofSize.width,
+                               height: ofSize.height)
+            context.cgContext.fillEllipse(in: rect)
+            context.cgContext.drawPath(using: .fillStroke)
+            context.cgContext.closePath()
             
             switch type {
             case .thumb:
+//                context.cgContext.setStrokeColor(#colorLiteral(red: 0, green: 0, blue: 0, alpha: 0.5))
+//                context.cgContext.setLineWidth(0.3)
+//                context.cgContext.strokeEllipse(in: rect)
+                let innerShadowColor = #colorLiteral(red: 0, green: 0, blue: 0, alpha: 0.5)
+                let innerShadowOffet = CGSize(width: ofSize.width, height: ofSize.height)
+                context.cgContext.setShadow(offset: innerShadowOffet,
+                                            blur: 1,
+                                            color: innerShadowColor.cgColor)
+                context.cgContext.fillPath()
                 break
             case .minimumTrack:
                 break
             case .maximumTrack:
-                break
+                let innerShadowColor = #colorLiteral(red: 0, green: 0, blue: 0, alpha: 0.5)
+                let innerShadowOffet = CGSize(width: ofSize.width, height: ofSize.height)
+                context.cgContext.setShadow(offset: innerShadowOffet,
+                                            blur: 3,
+                                            color: innerShadowColor.cgColor)
+                context.cgContext.fillPath()
             }
-            
-            context.cgContext.drawPath(using: .fillStroke)
-            context.cgContext.closePath()
         }
         return image
     }
 }
 
-
-private class Slider: UISlider {
+extension VerticalSlider {
     
-    override public func trackRect(forBounds bounds: CGRect) -> CGRect {
-        
-        let customBounds = CGRect(x: bounds.origin.x, y: bounds.height/2 - 10, width: bounds.size.width, height: 20)
-        super.trackRect(forBounds: customBounds)
-        return customBounds
-    }
 }
 
-private class GradientView: UIView {
+extension VerticalSlider: SliderDelegate {
     
-    override func layoutSubviews() {
-        
-        let gradientlayer = CAGradientLayer()
-        gradientlayer.frame = bounds
-        gradientlayer.cornerRadius = 10
-        gradientlayer.colors = [#colorLiteral(red: 0.7764705882, green: 0.9725490196, blue: 0, alpha: 0.5).cgColor, #colorLiteral(red: 0.09019607843, green: 0.2823529412, blue: 0.7098039216, alpha: 1).cgColor]
-        gradientlayer.locations = [0.0, 1.0]
-        layer.addSublayer(gradientlayer)
+    func startShowingSliderText() {
+        let sliderTextRect = slider.thumbRect()
+        sliderTextLabel.center.x = sliderTextRect.midX
+        sliderTextLabel.center.y = sliderTextRect.midY
+        sliderTextLabel.frame.size = CGSize(width: 100, height: 50)
+        addSubview(sliderTextLabel)
+        sliderTextLabel.attributedText = attributed(String(slider.value))
+    }
+    
+    func updateSliderText() {
+        sliderTextLabel.attributedText = attributed(String(slider.value))
+    }
+    
+    func attributed(_ text: String) -> NSAttributedString {
+        let attributes: [NSAttributedString.Key: Any] =
+            [.font : UIFont.systemFont(ofSize: 36, weight: .medium),
+             .foregroundColor : #colorLiteral(red: 0.4549019608, green: 0.462745098, blue: 0.5058823529, alpha: 1)]
+        let attributedString = NSAttributedString(string: text, attributes: attributes)
+        return attributedString
     }
 }
