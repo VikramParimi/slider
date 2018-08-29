@@ -14,11 +14,18 @@ private enum SliderImageType {
     case maximumTrack
 }
 
+public protocol VerticalSliderDelegate: class {
+    func sliderMovementBegan()
+    func sliderMoved()
+}
+
 @IBDesignable public class VerticalSlider: UIControl {
     
     private let slider = Slider()
     private let gradientView = GradientView()
     private lazy var sliderTextLabel = UILabel()
+    
+    public weak var delegate: VerticalSliderDelegate?
 
     public required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
@@ -44,6 +51,15 @@ private enum SliderImageType {
     public override func layoutSubviews() {
         super.layoutSubviews()
         
+        //Update slider appearance with gradientlayers and new thumb image
+        updateSliderApperance()
+        
+        //Adjust gradientView frame
+        updateGradientViewApperance()
+    }
+    
+    fileprivate func updateSliderApperance() {
+        
         //Transform the slider to vertical
         slider.transform = CGAffineTransform(rotationAngle: CGFloat.pi * -0.5)
         
@@ -51,21 +67,6 @@ private enum SliderImageType {
         slider.bounds.size.width = bounds.height - 10
         slider.center.x = bounds.midX
         slider.center.y = bounds.midY
-        
-        //Update slider appearance with gradientlayers and new thumb image
-        updateSliderApperance()
-        
-        //Adjust gradientView frame
-        gradientView.center.x = bounds.midX
-        gradientView.center.y = bounds.midY
-        
-        gradientView.bounds.size.width  = slider.trackRect(forBounds: slider.bounds).height
-        gradientView.bounds.size.height = slider.trackRect(forBounds: slider.bounds).width
-        
-        gradientView.layer.cornerRadius = 10
-    }
-    
-    fileprivate func updateSliderApperance() {
         
         //Set the custom thumb image
         let thumbImage = getImagefor(SliderImageType.thumb,
@@ -93,11 +94,17 @@ private enum SliderImageType {
         
         //Set the selector for tracking the value changes of the slider
         slider.addTarget(slider, action: #selector(Slider.sliderValueChanged(slider:forEvent:)), for: .valueChanged)
+    }
+    
+    fileprivate func updateGradientViewApperance() {
         
-        // FIXME: Removed hardcoded values, set through IB Inspectables
-        slider.minimumValue = 0
-        slider.value = 10
-        slider.maximumValue = 100
+        gradientView.center.x = bounds.midX
+        gradientView.center.y = bounds.midY
+        
+        gradientView.bounds.size.width  = slider.trackRect(forBounds: slider.bounds).height
+        gradientView.bounds.size.height = slider.trackRect(forBounds: slider.bounds).width
+        
+        gradientView.layer.cornerRadius = 10
     }
     
     fileprivate func getImagefor(_ type: SliderImageType, ofSize: CGSize, withColor: UIColor) -> UIImage {
@@ -110,57 +117,63 @@ private enum SliderImageType {
                                y: 0,
                                width: ofSize.width,
                                height: ofSize.height)
+            
             context.cgContext.fillEllipse(in: rect)
             context.cgContext.drawPath(using: .fillStroke)
-            context.cgContext.closePath()
-            
-            switch type {
-            case .thumb:
-//                context.cgContext.setStrokeColor(#colorLiteral(red: 0, green: 0, blue: 0, alpha: 0.5))
-//                context.cgContext.setLineWidth(0.3)
-//                context.cgContext.strokeEllipse(in: rect)
-                let innerShadowColor = #colorLiteral(red: 0, green: 0, blue: 0, alpha: 0.5)
-                let innerShadowOffet = CGSize(width: ofSize.width, height: ofSize.height)
-                context.cgContext.setShadow(offset: innerShadowOffet,
-                                            blur: 1,
-                                            color: innerShadowColor.cgColor)
-                context.cgContext.fillPath()
-                break
-            case .minimumTrack:
-                break
-            case .maximumTrack:
-                let innerShadowColor = #colorLiteral(red: 0, green: 0, blue: 0, alpha: 0.5)
-                let innerShadowOffet = CGSize(width: ofSize.width, height: ofSize.height)
-                context.cgContext.setShadow(offset: innerShadowOffet,
-                                            blur: 3,
-                                            color: innerShadowColor.cgColor)
-                context.cgContext.fillPath()
-            }
         }
         return image
     }
 }
 
+// MARK:- IBInspeactables
 extension VerticalSlider {
     
+    @IBInspectable open var minimumValue: Float {
+        get {
+            return slider.minimumValue
+        }
+        set {
+            slider.minimumValue = newValue
+        }
+    }
+    
+    @IBInspectable open var maximumValue: Float {
+        get {
+            return slider.maximumValue
+        }
+        set {
+            slider.maximumValue = newValue
+        }
+    }
+    
+    @IBInspectable open var value: Float {
+        get {
+            return slider.value
+        }
+        set {
+            slider.setValue(newValue, animated: true)
+        }
+    }
 }
+
 
 extension VerticalSlider: SliderDelegate {
     
     func startShowingSliderText() {
-        let sliderTextRect = slider.thumbRect()
-        sliderTextLabel.center.x = sliderTextRect.midX
-        sliderTextLabel.center.y = sliderTextRect.midY
-        sliderTextLabel.frame.size = CGSize(width: 100, height: 50)
         addSubview(sliderTextLabel)
-        sliderTextLabel.attributedText = attributed(String(slider.value))
+        delegate?.sliderMovementBegan()
     }
     
     func updateSliderText() {
-        sliderTextLabel.attributedText = attributed(String(slider.value))
+        let sliderThumbRect      = slider.thumbRect()
+        sliderTextLabel.attributedText = attributed(String(lroundf(slider.value)))
+        sliderTextLabel.sizeToFit()
+        
+        sliderTextLabel.frame.origin = CGPoint(x: slider.frame.origin.x + slider.bounds.height + 10, y: (slider.bounds.width - sliderThumbRect.midX - sliderTextLabel.bounds.height / 2) + 5)
+        delegate?.sliderMoved()
     }
     
-    func attributed(_ text: String) -> NSAttributedString {
+    fileprivate func attributed(_ text: String) -> NSAttributedString {
         let attributes: [NSAttributedString.Key: Any] =
             [.font : UIFont.systemFont(ofSize: 36, weight: .medium),
              .foregroundColor : #colorLiteral(red: 0.4549019608, green: 0.462745098, blue: 0.5058823529, alpha: 1)]
