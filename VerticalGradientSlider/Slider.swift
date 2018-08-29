@@ -8,37 +8,47 @@
 
 import UIKit
 
-protocol SliderDelegate: class {
-    func startShowingSliderText()
-    func updateSliderText()
+internal protocol SliderDelegate: class {
+    func sliderMovementBegan()
+    func sliderMoved()
 }
 
-class Slider: UISlider {
+private enum SliderConstants {
+    static let trackHeight: CGFloat = 20
+}
+
+public class Slider: UISlider {
     
-    weak var delegate: SliderDelegate?
+    internal weak var delegate: SliderDelegate?
     
     override public func trackRect(forBounds bounds: CGRect) -> CGRect {
         
-        let customBounds = CGRect(x: -bounds.origin.x, y: bounds.height/2 - 10, width: bounds.size.width, height: 20)
+        let customBounds = CGRect(x: bounds.origin.x,
+                                  y: (bounds.height/2 - SliderConstants.trackHeight/2),
+                                  width: bounds.size.width,
+                                  height: SliderConstants.trackHeight)
+        
         super.trackRect(forBounds: customBounds)
+        
         return customBounds
     }
     
-    func thumbRect() -> CGRect {
-        return self.thumbRect(forBounds: self.bounds, trackRect: self.trackRect(forBounds: self.bounds), value: self.value)
+    internal func thumbRect() -> CGRect {
+        return self.thumbRect(forBounds: self.bounds,
+                              trackRect: self.trackRect(forBounds: self.bounds),
+                              value: self.value)
     }
     
-    @objc func sliderValueChanged(slider: UISlider, forEvent: UIEvent) {
+    @objc internal func sliderValueChanged(slider: UISlider, forEvent: UIEvent) {
         if let touchEvent = forEvent.allTouches?.first {
             switch touchEvent.phase {
             case .began:
                 let touchLocation = touchEvent.location(in: self)
                 if self.thumbRect().contains(touchLocation) {
-                    delegate?.startShowingSliderText()
-                    delegate?.updateSliderText()
+                    delegate?.sliderMovementBegan()
                 }
             case .moved, .stationary, .ended:
-                delegate?.updateSliderText()
+                delegate?.sliderMoved()
             default:
                 break
             }
