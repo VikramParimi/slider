@@ -31,10 +31,14 @@ private enum VerticalSliderDefaults {
 @IBDesignable public class VerticalGradientSlider: UIControl {
     
     public  let slider = Slider()
+    
+    public weak var delegate: VerticalSliderDelegate?
+    
     private let gradientView = GradientView()
     private lazy var sliderTextLabel = UILabel()
     
-    public weak var delegate: VerticalSliderDelegate?
+    private var startColor   = #colorLiteral(red: 0.7764705882, green: 0.9725490196, blue: 0, alpha: 0.5)
+    private var endColor     = #colorLiteral(red: 0.09019607843, green: 0.2823529412, blue: 0.7098039216, alpha: 1)
     
     public required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
@@ -115,6 +119,9 @@ private enum VerticalSliderDefaults {
         gradientView.bounds.size.height = slider.trackRect(forBounds: slider.bounds).width
         
         gradientView.layer.cornerRadius = gradientView.bounds.size.height/2
+        
+        gradientView.startColor = startColor
+        gradientView.endColor   = endColor
     }
     
     fileprivate func getImagefor(_ type: SliderImageType, ofSize: CGSize, withColor: UIColor) -> UIImage {
@@ -156,12 +163,30 @@ extension VerticalGradientSlider {
         }
     }
     
-    @IBInspectable open var value: Float {
+    @IBInspectable open var currentValue: Float {
         get {
             return slider.value
         }
         set {
             slider.setValue(newValue, animated: true)
+        }
+    }
+    
+    @IBInspectable open var gradientStartColor: UIColor {
+        get {
+            return startColor
+        }
+        set {
+            startColor = newValue
+        }
+    }
+    
+    @IBInspectable open var gradientEndColor: UIColor {
+        get {
+            return endColor
+        }
+        set {
+            endColor = newValue
         }
     }
 }
